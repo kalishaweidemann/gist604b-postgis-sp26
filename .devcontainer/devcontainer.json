@@ -1,0 +1,33 @@
+{
+  "name": "PostGIS Development",
+
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "ckolkman.vscode-postgres"
+      ],
+    }
+  },
+
+  "forwardPorts": [5432],
+
+  "portsAttributes": {
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "notify"
+    }
+  },
+  
+  "remoteUser": "vscode"
+}
