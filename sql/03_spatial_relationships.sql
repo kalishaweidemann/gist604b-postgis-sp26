@@ -10,7 +10,15 @@
 
 -- TODO: Write your query below
 
+SELECT ST_AsText(geom) AS queensboro
+FROM nyc_streets
+WHERE name = 'Queensboro Brg';
 
+-- Find streets that start with 'Q' for the WHERE clause
+SELECT DISTINCT name
+FROM nyc_streets
+WHERE name LIKE 'Q%'
+ORDER BY name DESC;
 
 
 -- Exercise 2: What neighborhood and borough is Queensboro Brg in?
@@ -25,7 +33,18 @@
 
 -- TODO: Write your query below
 
-
+SELECT 
+    nbh.name AS neighborhood, 
+    nbh.boroname AS borough
+FROM nyc_neighborhoods AS nbh
+WHERE ST_Intersects(
+    nbh.geom,
+    (
+        SELECT geom AS queensboro
+        FROM nyc_streets
+        WHERE name = 'Queensboro Brg'
+    )
+);
 
 
 -- Exercise 3: What streets does Queensboro Brg intersect with?
@@ -43,7 +62,18 @@
 
 -- TODO: Write your query below
 
-
+SELECT name
+FROM nyc_streets
+WHERE ST_Intersects(
+    geom,
+    (
+        SELECT geom AS queensboro
+        FROM nyc_streets
+        WHERE name = 'Queensboro Brg'
+    )
+) 
+    AND name != 'Queensboro Brg'
+    AND name IS NOT NULL;
 
 
 -- Exercise 4: Approximately how many people live within 50 meters of Queensboro Brg?
@@ -58,5 +88,14 @@
 
 -- TODO: Write your query below
 
-
-
+SELECT SUM(popn_total) AS total_population
+FROM nyc_census_blocks
+WHERE ST_DWithin(
+    geom,
+    (
+        SELECT geom AS queensboro
+        FROM nyc_streets
+        WHERE name = 'Queensboro Brg'
+    ),
+    50
+);
