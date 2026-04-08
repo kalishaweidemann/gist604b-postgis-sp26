@@ -15,9 +15,20 @@
 -- Hint: Use ST_Intersects(ss.geom, n.geom) in the JOIN clause
 -- Hint: Filter rows where n.name = 'East Village'
 
+-- Find unique neighborhoods to verify spelling of 'East Village' for WHERE clause
+SELECT DISTINCT name
+FROM nyc_neighborhoods
+WHERE name LIKE 'E%';
+
 -- TODO: Write your query below
 
-
+SELECT 
+    ss.name,
+    ss.routes
+FROM nyc_subway_stations AS ss
+JOIN nyc_neighborhoods AS n
+    ON ST_Intersects(ss.geom, n.geom)
+WHERE n.name = 'East Village';
 
 
 -- Exercise 2: What are all the neighborhoods served by the 7-train?
@@ -38,9 +49,17 @@
 -- Hint: Use ST_Intersects(ss.geom, n.geom) in the JOIN clause
 -- Hint: Filter rows where ss.routes LIKE '%7%'
 
+-- Find unique route names for WHERE clause
+SELECT DISTINCT routes
+FROM nyc_subway_stations;
+
 -- TODO: Write your query below
 
-
+SELECT DISTINCT n.name AS neighborhood_name
+FROM nyc_neighborhoods AS n
+JOIN nyc_subway_stations AS ss
+    ON ST_Intersects(n.geom, ss.geom)
+WHERE ss.routes LIKE '%7%';
 
 
 -- Exercise 3: How many people live in the Financial District?
@@ -54,10 +73,18 @@
 -- Hint: Use ST_Intersects(cb.geom, n.geom) in the JOIN clause
 -- Hint: Filter rows where n.name = 'Financial District'
 
+-- Find unique neighborhoods to verify spelling of 'Financial District' for WHERE clause
+SELECT DISTINCT name
+FROM nyc_neighborhoods
+WHERE name LIKE 'F%';
+
 -- TODO: Write your query below
 
-
-
+SELECT SUM(popn_total) AS total_population
+FROM nyc_census_blocks AS cb
+JOIN nyc_neighborhoods AS n
+    ON ST_Intersects(cb.geom, n.geom)
+WHERE n.name = 'Financial District';
 
 
 -- Exercise 4: What are the population densities (people / km^2) of the 'East Village' and 'West Village'?
@@ -74,7 +101,19 @@
 -- Hint: Filter rows where n.name IN ('East Village', 'West Village')
 -- Hint: GROUP BY n.name, n.geom
 
+-- Find unique neighborhoods to verify spelling for WHERE clause
+SELECT DISTINCT name
+FROM nyc_neighborhoods
+WHERE name LIKE '%Village%'
+ORDER BY name;
+
 -- TODO: Write your query below
 
-
-
+SELECT 
+    n.name AS name,
+    SUM(cb.popn_total) / (ST_Area(n.geom) / 1000000.0) AS population_density_per_sqkm      
+FROM nyc_census_blocks AS cb
+JOIN nyc_neighborhoods AS n
+    ON ST_Intersects (cb.geom, n.geom)
+WHERE n.name IN ('East Village', 'West Village')
+GROUP BY n.name, n.geom;

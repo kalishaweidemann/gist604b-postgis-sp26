@@ -10,15 +10,15 @@
 
 -- TODO: Write your query below
 
-SELECT ST_AsText(geom) AS queensboro
-FROM nyc_streets
-WHERE name = 'Queensboro Brg';
-
 -- Find streets that start with 'Q' for the WHERE clause
 SELECT DISTINCT name
 FROM nyc_streets
 WHERE name LIKE 'Q%'
 ORDER BY name DESC;
+
+SELECT ST_AsText(geom) AS queensboro
+FROM nyc_streets
+WHERE name = 'Queensboro Brg';
 
 
 -- Exercise 2: What neighborhood and borough is Queensboro Brg in?
