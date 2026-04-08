@@ -13,7 +13,9 @@
 
 -- TODO: Write your query below
 
-
+SELECT ST_Area(geom) AS new_brighton_area_sq_m
+FROM nyc_neighborhoods
+WHERE name = 'New Brighton'
 
 
 -- Exercise 2: What is the area of the Bronx in acres?
@@ -29,7 +31,10 @@
 
 -- TODO: Write your query below
 
-
+SELECT 
+    (ST_Area(ST_Union(geom)) / 4046.86) AS bronx_area_acres
+FROM nyc_neighborhoods
+WHERE boroname = 'The Bronx';
 
 
 -- Exercise 3: How many census blocks in New York City DO NOT have a hole in them?
@@ -45,7 +50,15 @@
 
 -- TODO: Write your query below
 
+SELECT COUNT(*) AS no_hole_polygons
+FROM nyc_census_blocks
+WHERE ST_NumInteriorRings(geom) = 0;
 
+-- Check 10 rows with the highest number of holes (all NULL in this case)
+SELECT ST_NumInteriorRings(geom) AS num_holes
+FROM nyc_census_blocks
+ORDER BY num_holes DESC
+LIMIT 10;
 
 
 -- Exercise 4: What is the total length of streets (in miles) in New York City?
@@ -61,7 +74,9 @@
 
 -- TODO: Write your query below
 
-
+SELECT 
+    (SUM(ST_Length(geom)) / 1609.34) AS total_length_miles
+FROM nyc_streets;
 
 
 -- Exercise 5: How long is '5th Ave' in meters?
@@ -77,7 +92,9 @@
 
 -- TODO: Write your query below
 
-
+SELECT SUM(ST_Length(geom)) AS fifth_ave_length
+FROM nyc_streets
+WHERE name = '5th Ave';
 
 
 -- Exercise 6: What is the JSON representation of the boundary of 'Soho'?
@@ -92,7 +109,10 @@
 
 -- TODO: Write your query below
 
-
+SELECT
+    ST_AsGeoJSON(geom) AS soho_geojson
+FROM nyc_neighborhoods
+WHERE name = 'Soho';
 
 
 -- Exercise 7: How many polygons are in the 'Coney Island' multipolygon?
@@ -100,12 +120,18 @@
 -- num_coney_island_polygons
 -- 4
 
--- TODO: Write a SELECT statement to count geometries in 'Coney Island'
+-- Hint: Write a SELECT statement to count geometries in 'Coney Island'
 -- Hint: Use ST_NumGeometries() on the geom column 
 -- Hint: Use num_coney_island_polygons as the output alias
 -- Hint: Use the nyc_neighborhoods table
 -- Hint: Filter rows where name = 'Coney Island'
 
+-- TODO: Write your query below
+
+SELECT 
+    ST_NumGeometries(geom) AS num_coney_island_polygons
+FROM nyc_neighborhoods
+WHERE name = 'Coney Island';
 
 
 -- Exercise 8: What are the 5 longest roads in NYC?
@@ -124,5 +150,10 @@
 -- Hint: ORDER BY ST_Length(geom) DESC OR use the alias length_meters
 -- Hint: Use LIMIT 5
 
+-- TODO: Write your query below
 
-
+SELECT 
+    name, ST_Length(geom) AS length_meters
+FROM nyc_streets
+ORDER BY length_meters DESC
+LIMIT 5; 
